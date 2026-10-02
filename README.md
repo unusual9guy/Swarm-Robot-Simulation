@@ -1,6 +1,6 @@
 # Swarm-Robot-Simulation
 
-My BSc dissertation at the University of Manchester (2021 to 2024): "Simulation and Optimization of the Beta-Algorithm for Autonomous Swarm Robotics". The full write-up is in `Swarm-Robot-Simulation-Report.pdf`.
+My BSc dissertation at the University of Manchester: "Simulation and Optimization of the Beta-Algorithm for Autonomous Swarm Robotics". The full write-up is in `Swarm-Robot-Simulation-Report.pdf`.
 
 A robot swarm is a group of simple robots that coordinate through local communication instead of a central controller. The beta algorithm is a rule that keeps such a swarm connected.
 
@@ -31,7 +31,14 @@ flowchart TD
 
 ## Results
 
-I varied the beta threshold and measured the distance between pairs of robots to see how tightly the swarm stayed together. In my setup, beta = 2 gave the best balance between coherence and spread. The PDF report has the method, the data and the caveats. I have not copied the figures here, so read the report for exact numbers.
+I tested beta values of 1, 2, 3 and 5 and judged how long the swarm stayed together and evenly spread, using the distance between pairs of robots.
+
+- Beta = 2 gave the best result. Most pairs stayed 30 to 35 cm apart for about 1 minute 20 seconds, and few robots left the group.
+- Beta = 1 kept the swarm together only briefly, and the spread became uneven.
+- Beta = 3 kept coherence but let some robots break away.
+- Beta = 5 was weaker, with more robots out of formation.
+
+Every run ended when the Webots controller crashed, so the runs were short and may hide the full effect of beta. The report has the method, figures and caveats.
 
 ## Run it
 
@@ -39,7 +46,7 @@ TODO: the Webots world file and the C controller are not in this repo, so the si
 
 ## Limitations and next steps
 
-- The experiments used a small swarm in a square arena, and my laptop limited how many robots I could simulate.
+- Controller crashes cut every experiment short. The experiments used a small swarm in a square arena, and my laptop limited how many robots I could simulate.
 - Webots made logging swarm data awkward, so I built custom logging.
 - Next steps: keep the swarm tighter, use situated communication (messages tied to where robots are), try other swarm shapes, and test on physical robots.
 
