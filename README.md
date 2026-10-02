@@ -1,46 +1,57 @@
-# 🤖✨ Simulating Robot Swarms with the Beta Algorithm
+# Swarm-Robot-Simulation
 
-Hey there, future roboticist! 👋 Welcome to the repository for my third-year project at the University of Manchester, where we dive into the fascinating world of **Swarm Robotics**!
+My BSc dissertation at the University of Manchester: "Simulation and Optimization of the Beta-Algorithm for Autonomous Swarm Robotics". The full write-up is in `Swarm-Robot-Simulation-Report.pdf`.
 
-Ever wondered how flocks of birds or schools of fish move so gracefully together without bumping into each other? That's kind of what we're exploring here, but with robots! This project simulates a swarm of cool little bots and investigates how they can stick together and act as one coordinated unit – a concept called **coherence**.
+A robot swarm is a group of simple robots that coordinate through local communication instead of a central controller. The beta algorithm is a rule that keeps such a swarm connected.
 
-## 🤔 What's the Big Idea?
+## Problem and approach
 
-Making individual robots is cool, but making *lots* of simple robots work together opens up amazing possibilities – from search and rescue missions to automated warehouses and even dazzling drone light shows!
+Robots in a swarm only talk to nearby neighbours, so the group can drift apart and lose contact. The beta algorithm limits that drift.
 
-But getting them to cooperate isn't easy. They need to stay connected and organized, especially when things get tricky. This project focuses on one specific method to achieve this: the **Beta (β) Algorithm**.
+1. Each robot broadcasts a heartbeat message with its ID and the robots it can see.
+2. When a robot loses contact with a neighbour, it counts how many shared neighbours can still see that neighbour.
+3. If the count falls below a threshold, beta, the robot turns around to reconnect.
 
-## 🔬 What's Inside This Project?
+I simulated this in Webots, an open-source robot simulator, with the e-puck robot (a small wheeled research robot with infrared sensors). The controller is written in C. It combines Braitenberg-style obstacle avoidance (steering from raw sensor readings), the heartbeat messages and the beta rule, with extra logic so robots escape corners of the square arena.
 
-* **The Beta (β) Algorithm:** This is the star of the show! It's a clever way for robots to maintain connections with their neighbors using local communication. If a robot loses connection, it checks how many *shared* neighbors can still see the lost buddy. If that number drops below a threshold (β), it does a U-turn to try and reconnect! Pretty neat, huh?
-* **Simulation Setup:** We used the **Webots** simulator – a fantastic tool for modeling and testing robots. Why Webots? It has a great physics engine (ODE), pre-built robot models, and let us focus on the algorithm itself.
-* **Our Little Hero - The 'epuck' Robot:** We used the 'epuck' robot model. It's a popular choice in swarm research, equipped with infrared sensors for detecting obstacles (and buddies!) and wheels to zip around.
-* **The Brains (Controller):** The robot's behavior is programmed in C. It handles:
-    * **Obstacle Avoidance:** Using a Braitenberg-inspired approach, the robot uses its sensors to steer away from walls. We even added special logic to handle tricky corners!
-    * **Communication:** Robots broadcast "heartbeat" messages with their ID and who they can see.
-    * **β-Algorithm Logic:** Implementing the core rules for checking connections and deciding when to turn back.
-* **Experiments:** We played around with different values for the β threshold to see how it affected the swarm's "spread" and coherence. We measured the distance between robot pairs to see how tightly knit the swarm stayed. Spoiler: β=2 seemed to be the sweet spot in our setup!
+## Architecture
 
-## 🎢 The Journey & Challenges
+```mermaid
+flowchart TD
+  A[Read infrared sensors] --> B[Avoid walls and other robots]
+  B --> C[Broadcast heartbeat<br/>ID and visible neighbours]
+  C --> D{Neighbour lost?}
+  D -- no --> A
+  D -- yes --> E[Count shared neighbours<br/>that still see it]
+  E --> F{Count below beta?}
+  F -- yes --> G[Turn around to reconnect]
+  F -- no --> A
+  G --> A
+```
 
-It wasn't all smooth sailing!
-* **Simulator Battles:** Choosing the right simulator took time. Gazebo didn't play nice with Windows, and others seemed too complex. Webots was great but had its own quirks.
-* **Collision Course:** Getting robots to avoid walls was one thing, but stopping them from bumping into *each other* needed extra tweaking.
-* **Corner Conundrums:** Robots kept getting stuck in the corners of the square arena! We had to implement specific logic to help them escape.
-* **Data Drama:** Webots didn't make tracking swarm data super easy, so we had to build custom ways to log results. My laptop also struggled with simulating *lots* of robots.
+## Results
 
-## 🚀 Future Directions
+I tested beta values of 1, 2, 3 and 5 and judged how long the swarm stayed together and evenly spread, using the distance between pairs of robots.
 
-This is just the beginning! Future work could involve:
-* Making the β-Algorithm even better at keeping the swarm tightly packed.
-* Exploring ideas from "situated communication" to help the swarm adapt better.
-* Experimenting with different swarm shapes for different tasks.
-* Testing these ideas on **real physical robots**!
+- Beta = 2 gave the best result. Most pairs stayed 30 to 35 cm apart for about 1 minute 20 seconds, and few robots left the group.
+- Beta = 1 kept the swarm together only briefly, and the spread became uneven.
+- Beta = 3 kept coherence but let some robots break away.
+- Beta = 5 was weaker, with more robots out of formation.
 
-## 🙏 Acknowledgements
+Every run ended when the Webots controller crashed, so the runs were short and may hide the full effect of beta. The report has the method, figures and caveats.
 
-A massive thank you to my supervisor, **Prof. Clare Dixon**, for the invaluable guidance and support throughout this project!
+## Run it
 
----
+TODO: the Webots world file and the C controller are not in this repo, so the simulation cannot be run from here yet. I will add them with run instructions. Until then the report is the deliverable.
 
-Thanks for checking out the project! Feel free to explore the code and the full report (`Swarm-Robot-Simulation-Report.pdf`) for all the nitty-gritty details. Happy Swarming! 🎉
+## Limitations and next steps
+
+- Controller crashes cut every experiment short. The experiments used a small swarm in a square arena, and my laptop limited how many robots I could simulate.
+- Webots made logging swarm data awkward, so I built custom logging.
+- Next steps: keep the swarm tighter, use situated communication (messages tied to where robots are), try other swarm shapes, and test on physical robots.
+
+I thank my supervisor, Prof. Clare Dixon, for her guidance.
+
+## Screenshot
+
+TODO: add a screenshot or GIF of the Webots simulation.
